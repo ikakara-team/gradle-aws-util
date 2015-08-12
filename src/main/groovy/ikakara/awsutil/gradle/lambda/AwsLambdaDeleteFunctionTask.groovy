@@ -27,7 +27,7 @@ import com.amazonaws.services.lambda.model.DeleteFunctionRequest
 
 public class AwsLambdaDeleteFunctionTask extends ConventionTask {
 
-  private String functionName
+  String functionName
 
   public AwsLambdaDeleteFunctionTask() {
     setDescription("Delete Lambda function.")
@@ -40,7 +40,9 @@ public class AwsLambdaDeleteFunctionTask extends ConventionTask {
       throw new GradleException("functionName is required")
     }
 
-    AwsLambdaPluginExtension ext = project.extensions.getByType(AwsLambdaPluginExtension.class)
+    println "AwsLambdaDeleteFunctionTask task: name=${functionName}"
+
+    LambdaAwsPluginExtension ext = project.extensions.getByType(LambdaAwsPluginExtension.class)
     AWSLambda lambda = ext.client
 
     DeleteFunctionRequest request = new DeleteFunctionRequest()

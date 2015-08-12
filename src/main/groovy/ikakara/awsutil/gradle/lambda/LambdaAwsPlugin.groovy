@@ -21,12 +21,15 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 import ikakara.awsutil.gradle.AwsPlugin
+import ikakara.awsutil.gradle.AwsPluginExtension
 
-@CompileStatic
-class AwsLambdaPlugin implements Plugin<Project> {
+//@CompileStatic
+class LambdaAwsPlugin extends AwsPlugin {
   @Override
   public void apply(Project project) {
-    project.getPluginManager().apply(AwsPlugin.class)
-    project.getExtensions().create(AwsLambdaPluginExtension.NAME, AwsLambdaPluginExtension.class, project)
+    // apply the super extension
+    super.apply(project)  // project.pluginManager.apply(AwsPlugin.class)
+    // then add an extension to the super extension
+    project.property(AwsPluginExtension.EXT_AWS).extensions.create(LambdaAwsPluginExtension.EXT_LAMBDA, LambdaAwsPluginExtension.class, project)
   }
 }

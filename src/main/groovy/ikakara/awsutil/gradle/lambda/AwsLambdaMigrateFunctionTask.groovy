@@ -40,16 +40,15 @@ import com.amazonaws.services.lambda.model.UpdateFunctionConfigurationRequest
 import com.amazonaws.services.lambda.model.UpdateFunctionConfigurationResult
 
 public class AwsLambdaMigrateFunctionTask extends ConventionTask {
-  private String functionName
-  private String role
-  private Runtime runtime = Runtime.Nodejs
-  private String handler
-  private String functionDescription
-  private Integer timeout
-  private Integer memorySize
-  private File zipFile
-  private CreateFunctionResult createFunctionResult
-
+  String functionName
+  String role
+  Runtime runtime = Runtime.Nodejs
+  String handler
+  String functionDescription
+  Integer timeout
+  Integer memorySize
+  File zipFile
+  CreateFunctionResult createFunctionResult
 
   public AwsLambdaMigrateFunctionTask() {
     setDescription("Create / Update Lambda function.")
@@ -62,14 +61,16 @@ public class AwsLambdaMigrateFunctionTask extends ConventionTask {
       throw new GradleException("functionName is required")
     }
 
-    AwsLambdaPluginExtension ext = project.extensions.getByType(AwsLambdaPluginExtension.class)
+    println "AwsLambdaMigrateFunctionTask task: name=${functionName}"
+
+    LambdaAwsPluginExtension ext = project.extensions.getByType(LambdaAwsPluginExtension.class)
     AWSLambda lambda = ext.client
 
     try {
       GetFunctionResult getFunctionResult = lambda.getFunction(new GetFunctionRequest().withFunctionName(functionName))
       updateStack(lambda, getFunctionResult)
     } catch (AmazonServiceException e) {
-      if (e.getMessage().contains("does not exist")) {
+      if (e.message.contains("does not exist")) {
         getLogger().warn("function {} not found", functionName)
         createFunction(lambda)
       } else {

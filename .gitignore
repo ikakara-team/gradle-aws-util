@@ -2,3 +2,4 @@ build
 extra
 .gradle
 .nb-gradle
+.nb-gradle-properties

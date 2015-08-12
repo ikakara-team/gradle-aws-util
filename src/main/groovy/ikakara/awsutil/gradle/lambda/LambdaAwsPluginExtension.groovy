@@ -25,23 +25,42 @@ import com.amazonaws.services.lambda.AWSLambdaClient
 import ikakara.awsutil.gradle.AwsPluginExtension
 
 @CompileStatic
-class AwsLambdaPluginExtension {
-  static final String NAME = "lambda"
+class LambdaAwsPluginExtension {
+  static final String EXT_LAMBDA = "lambda"
 
   Project project
   String profileName
   String region
 
-  private final AWSLambda client = initClient()
+  private final AWSLambda client
 
-  AwsLambdaPluginExtension(Project project) {
-    this.project = project
+  LambdaAwsPluginExtension(Project proj) {
+    project = proj
+    client = initClient()
   }
 
   private AWSLambda initClient() {
-    AwsPluginExtension aws = project.getExtensions().getByType(AwsPluginExtension.class)
-    AWSLambda client = aws.createClient(AWSLambdaClient.class, profileName)
-    client.setRegion(aws.getActiveRegion(region))
+    println "#################################LambdaAwsPluginExtension.initClient: project=${project} profileName=${profileName} region=${region} ext=${project?.extensions}"
+
+    AwsPluginExtension aws = project.extensions.getByType(AwsPluginExtension.class)
+
+    if(!client) {
+      AWSLambda client = aws.createClient(AWSLambdaClient.class, profileName)
+      client.setRegion(aws.getActiveRegion(region))
+    }
+
+
+
+    def res
+
+    try {
+      //res = client.listFunctions()
+    } catch(e) {
+      println e
+    }
+
+    project.extensions.each { println "DDDDDDDDDDDDDDDDDD" + it }
+
     return client
   }
 

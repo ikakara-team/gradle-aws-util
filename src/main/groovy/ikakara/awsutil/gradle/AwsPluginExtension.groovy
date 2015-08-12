@@ -44,7 +44,7 @@ import ikakara.awsutil.gradle.AwsPlugin
 
 @CompileStatic
 class AwsPluginExtension {
-  static final String NAME = "aws"
+  static final String EXT_AWS = "aws"
   static final AWSCredentialsProvider EMPTY = new AWSCredentialsProvider() {
     void refresh() {}
     AWSCredentials getCredentials() { return null }
@@ -54,42 +54,48 @@ class AwsPluginExtension {
   String profileName = "default"
   String region = Regions.US_EAST_1.getName()
 
-  AwsPluginExtension(Project project) {
-    this.project = project
+  AwsPluginExtension(Project proj) {
+    project = proj
   }
 
-  AWSCredentialsProvider newCredentialsProvider(String profileName) {
+  AWSCredentialsProvider newCredentialsProvider(String name) {
+    println "===============AwsPluginExtension.newCredentialsProvider: name=${name} profileName=${profileName}"
+
     return new AWSCredentialsProviderChain(
       new EnvironmentVariableCredentialsProvider(),
       new SystemPropertiesCredentialsProvider(),
-      profileName ? new ProfileCredentialsProvider(profileName) : EMPTY,
-      new ProfileCredentialsProvider(this.profileName),
+      name ? new ProfileCredentialsProvider(name) : EMPTY,
+      new ProfileCredentialsProvider(profileName),
       new InstanceProfileCredentialsProvider())
   }
 
-  public <T extends AmazonWebServiceClient> T createClient(Class<T> serviceClass, String profileName) {
-    if (profileName == null) {
-      if (this.profileName == null) {
+  public <T extends AmazonWebServiceClient> T createClient(Class<T> serviceClass, String name) {
+    if (!name) {
+      if (!profileName) {
         throw new IllegalStateException("default profileName is null")
       }
-      profileName = this.profileName
+      name = profileName
     }
 
-    AWSCredentialsProvider credentialsProvider = newCredentialsProvider(profileName)
+    AWSCredentialsProvider credentialsProvider = newCredentialsProvider(name)
     return createClient(serviceClass, credentialsProvider, null)
   }
 
-  static <T extends AmazonWebServiceClient> T createClient(Class<T> serviceClass,
-    AWSCredentialsProvider credentials, ClientConfiguration config) {
+  static <T extends AmazonWebServiceClient> T createClient(Class<T> serviceClass, AWSCredentialsProvider credentials, ClientConfiguration config) {
     Constructor<T> constructor
     T client
+
+    println "=============AwsPluginExtension.createClient: class=${serviceClass} cred=${credentials} config=${config}"
+
     try {
-      if (credentials == null && config == null) {
-        constructor = serviceClass.getConstructor()
-        client = constructor.newInstance()
-      } else if (credentials == null) {
-        constructor = serviceClass.getConstructor(ClientConfiguration.class)
-        client = constructor.newInstance(config)
+      if (credentials == null) {
+        if(config == null) {
+          constructor = serviceClass.getConstructor()
+          client = constructor.newInstance()
+        } else {
+          constructor = serviceClass.getConstructor(ClientConfiguration.class)
+          client = constructor.newInstance(config)
+        }
       } else if (config == null) {
         constructor = serviceClass.getConstructor(AWSCredentialsProvider.class)
         client = constructor.newInstance(credentials)
@@ -98,6 +104,8 @@ class AwsPluginExtension {
         client = constructor.newInstance(credentials, config)
       }
 
+      println "=============AwsPluginExtension.createClient: class=${serviceClass} cred=${credentials} config=${config} created_client=${client}"
+
       return client
     } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException("Couldn't instantiate instance of " + serviceClass, e)
@@ -105,20 +113,20 @@ class AwsPluginExtension {
   }
 
   Region getActiveRegion(String clientRegion) {
-    if (clientRegion != null) {
+    if (clientRegion) {
       return RegionUtils.getRegion(clientRegion)
     }
-    if (this.region == null) {
+    if (!region) {
       throw new IllegalStateException("default region is null")
     }
     return RegionUtils.getRegion(region)
   }
 
   String getActiveProfileName(String clientProfileName) {
-    if (clientProfileName != null) {
+    if (clientProfileName) {
       return clientProfileName
     }
-    if (this.profileName == null) {
+    if (!profileName) {
       throw new IllegalStateException("default profileName is null")
     }
     return profileName
@@ -130,15 +138,17 @@ class AwsPluginExtension {
   }
 
   String getUserArn() {
+    println "===========AwsPluginExtension.getUserArn: project=${project} profileName=${profileName} region=${region} ext=${project?.extensions}"
+
     AmazonIdentityManagement iam = createClient(AmazonIdentityManagementClient.class, profileName)
     try {
-      GetUserResult getUserResult = iam.getUser()
-      return getUserResult.getUser().getArn()
+      GetUserResult getUserResult = iam.user
+      return getUserResult.user.arn
     } catch (AmazonServiceException e) {
       if (e.getErrorCode().equals("AccessDenied") == false) {
         throw e
       }
-      String msg = e.getMessage()
+      String msg = e.message
       int arnIdx = msg.indexOf("arn:aws")
       if (arnIdx == -1) {
         throw e

@@ -31,9 +31,9 @@ import com.amazonaws.services.lambda.model.UpdateFunctionCodeRequest
 import com.amazonaws.services.lambda.model.UpdateFunctionCodeResult
 
 public class AwsLambdaUpdateFunctionCodeTask extends ConventionTask {
-  private String functionName
-  private File zipFile
-  private UpdateFunctionCodeResult updateFunctionCode
+  String functionName
+  File zipFile
+  UpdateFunctionCodeResult updateFunctionCode
 
 
   public AwsLambdaUpdateFunctionCodeTask() {
@@ -47,7 +47,9 @@ public class AwsLambdaUpdateFunctionCodeTask extends ConventionTask {
       throw new GradleException("functionName is required")
     }
 
-    AwsLambdaPluginExtension ext = project.extensions.getByType(AwsLambdaPluginExtension.class)
+    println "AwsLambdaUpdateFunctionCodeTask task: name=${functionName}"
+
+    LambdaAwsPluginExtension ext = project.extensions.getByType(LambdaAwsPluginExtension.class)
     AWSLambda lambda = ext.client
 
     RandomAccessFile raf
@@ -71,6 +73,6 @@ public class AwsLambdaUpdateFunctionCodeTask extends ConventionTask {
         channel.close()
       }
     }
-    
+
   }
 }

@@ -36,12 +36,12 @@ import com.google.common.io.Files
 
 public class AwsLambdaInvokeTask extends ConventionTask {
 
-  private String functionName
-  private InvocationType invocationType
-  private LogType logType = LogType.None
-  private String clientContext
-  private Object payload
-  private InvokeResult invokeResult
+  String functionName
+  InvocationType invocationType
+  LogType logType = LogType.None
+  String clientContext
+  Object payload
+  InvokeResult invokeResult
 
   public AwsLambdaInvokeTask() {
     setDescription("Invoke Lambda function.")
@@ -54,7 +54,9 @@ public class AwsLambdaInvokeTask extends ConventionTask {
       throw new GradleException("functionName is required")
     }
 
-    AwsLambdaPluginExtension ext = project.extensions.getByType(AwsLambdaPluginExtension.class)
+    println "AwsLambdaInvokeTask task: name=${functionName}"
+
+    LambdaAwsPluginExtension ext = project.extensions.getByType(LambdaAwsPluginExtension.class)
     AWSLambda lambda = ext.client
 
     InvokeRequest request = new InvokeRequest()

@@ -27,13 +27,13 @@ import com.amazonaws.services.lambda.model.UpdateFunctionConfigurationRequest
 import com.amazonaws.services.lambda.model.UpdateFunctionConfigurationResult
 
 public class AwsLambdaUpdateFunctionConfigurationTask extends ConventionTask {
-  private String functionName
-  private String role
-  private String handler
-  private String functionDescription
-  private Integer timeout
-  private Integer memorySize
-  private UpdateFunctionConfigurationResult updateFunctionConfiguration
+  String functionName
+  String role
+  String handler
+  String functionDescription
+  Integer timeout
+  Integer memorySize
+  UpdateFunctionConfigurationResult updateFunctionConfiguration
 
   public AwsLambdaUpdateFunctionConfigurationTask() {
     setDescription("Update Lambda function configuration.")
@@ -46,7 +46,12 @@ public class AwsLambdaUpdateFunctionConfigurationTask extends ConventionTask {
       throw new GradleException("functionName is required")
     }
 
-    AwsLambdaPluginExtension ext = project.extensions.getByType(AwsLambdaPluginExtension.class)
+    println "AwsLambdaUpdateFunctionConfigurationTask task: name=${functionName}"
+
+    def log = this.getLogger()
+    log.debug("-------------------------------- here i am")
+
+    LambdaAwsPluginExtension ext = project.extensions.getByType(LambdaAwsPluginExtension.class)
     AWSLambda lambda = ext.client
 
     UpdateFunctionConfigurationRequest request = new UpdateFunctionConfigurationRequest()

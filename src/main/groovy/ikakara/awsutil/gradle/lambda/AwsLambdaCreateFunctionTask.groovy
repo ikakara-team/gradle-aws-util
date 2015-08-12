@@ -37,15 +37,15 @@ import com.amazonaws.services.lambda.model.Runtime
 @CompileStatic
 class AwsLambdaCreateFunctionTask extends ConventionTask {
 
-  private String functionName
-  private String role
-  private Runtime runtime = Runtime.Nodejs
-  private String handler
-  private String functionDescription
-  private Integer timeout
-  private Integer memorySize
-  private File zipFile
-  private CreateFunctionResult createFunctionResult
+  String functionName
+  String role
+  Runtime runtime = Runtime.Nodejs
+  String handler
+  String functionDescription
+  Integer timeout
+  Integer memorySize
+  File zipFile
+  CreateFunctionResult createFunctionResult
 
   AwsLambdaCreateFunctionTask() {
     setDescription("Create Lambda function.")
@@ -58,7 +58,9 @@ class AwsLambdaCreateFunctionTask extends ConventionTask {
       throw new GradleException("functionName is required")
     }
 
-    AwsLambdaPluginExtension ext = project.extensions.getByType(AwsLambdaPluginExtension.class)
+    println "AwsLambdaCreateFunctionTask task: name=${functionName}"
+
+    LambdaAwsPluginExtension ext = project.extensions.getByType(LambdaAwsPluginExtension.class)
     AWSLambda lambda = ext.client
 
     RandomAccessFile raf

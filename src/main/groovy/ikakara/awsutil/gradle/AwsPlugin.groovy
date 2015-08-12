@@ -26,6 +26,6 @@ import ikakara.awsutil.gradle.AwsPluginExtension
 class AwsPlugin implements Plugin<Project> {
   @Override
   void apply(Project project) {
-    project.extensions.create(AwsPluginExtension.NAME, AwsPluginExtension.class, project)
+    project.extensions.create(AwsPluginExtension.EXT_AWS, AwsPluginExtension.class, project)
   }
 }
