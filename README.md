@@ -1,8 +1,10 @@
 # gradle-aws-util
 
+https://plugins.gradle.org/plugin/ikakara.awsutil.lambda
+
 Description:
 --------------
-This gradle plugin is used to develop AWS Lambda functions and upload/manage them.
+This gradle plugin is used to develop AWS Lambda functions and upload/manage them on AWS.
 
 Development Setup:
 --------------
