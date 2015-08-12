@@ -53,7 +53,7 @@ plugins {
 
 Copyright & License:
 --------------
-Copyright 2014-2015 the original author or authors.
+Copyright 2015 the original author or authors.
 
 ```
 Apache 2 License - http://www.apache.org/licenses/LICENSE-2.0
